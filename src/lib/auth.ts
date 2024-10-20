@@ -1,11 +1,8 @@
-export const setToken = (token: string, rememberMe: boolean) => {
-    // Armazena o token no localStorage
-    localStorage.setItem("token", token);
-
-    // Se "lembrar-me" estiver habilitado, armazena essa preferência
+// lib/auth.ts
+export function setToken(token: string, rememberMe: boolean) {
     if (rememberMe) {
-        localStorage.setItem("rememberMe", "true");
+        localStorage.setItem("token", token);
     } else {
-        localStorage.removeItem("rememberMe");
+        sessionStorage.setItem("token", token);
     }
-};
+}

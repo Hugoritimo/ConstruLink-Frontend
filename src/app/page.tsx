@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import Link from "next/link";
-import { setToken } from "@/lib/auth"; // Certifique-se que a função está corretamente exportada
+import { setToken } from "@/lib/auth"; // Certifique-se de que a função está corretamente exportada
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     if (!username || !password) {
       toast.error("Por favor, preencha todos os campos.");
       setIsLoading(false);
@@ -30,19 +31,17 @@ export default function LoginPage() {
     }
 
     try {
-      console.log("Enviando dados:", { username, password });
-
-      const response = await fetch("http://localhost:3001/auth/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: username, password }), // Ajuste para a estrutura correta do backend
+        body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        const token = result.token || result.accessToken; // Use o campo correto retornado pelo backend
+        const token = result.token;
 
-        setToken(token, rememberMe); // Agora `setToken` aceita dois argumentos
+        setToken(token, rememberMe);
         toast.success("Login bem-sucedido!");
 
         setTimeout(() => {
