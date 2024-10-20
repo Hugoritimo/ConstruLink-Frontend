@@ -3,8 +3,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 
+// Definindo o tipo do objeto RDO
+interface Rdo {
+  id: number; // ou string, dependendo da sua API
+  username: string;
+  date: string;
+}
+
 const UsersRdos = () => {
-  const [rdos, setRdos] = useState([]);
+  const [rdos, setRdos] = useState<Rdo[]>([]); // Tipando o estado
 
   useEffect(() => {
     // Faz uma requisição para buscar os RDOS preenchidos
