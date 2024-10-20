@@ -243,12 +243,13 @@ const RelatorioDiarioObras: React.FC = () => {
   const handleCheckboxChange = (
     index: number,
     section: "checklistSeguranca",
-    value: boolean
+    value: boolean | "indeterminate"
   ) => {
+    const isChecked = value === true;
     const newArray = [...formData[section]];
     newArray[index] = {
       ...newArray[index],
-      status: value,
+      status: isChecked,
     };
     setFormData({ ...formData, [section]: newArray });
   };
