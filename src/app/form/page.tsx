@@ -8,7 +8,100 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 
-const initialFormData = {
+// Definição de Interfaces
+interface Efetivo {
+  nome: string;
+  funcao: string;
+  quantidade: string;
+  horasNormais: string;
+  horasExtras: string;
+  inicioJornada: string;
+  fimJornada: string;
+  atividadesRealizadas: string;
+}
+
+interface Equipamento {
+  nome: string;
+  quantidade: string;
+  condicao: string;
+  dataInspecao: string;
+  observacoes: string;
+}
+
+interface Ferramenta {
+  nome: string;
+  quantidade: string;
+  condicao: string;
+  dataInspecao: string;
+  observacoes: string;
+}
+
+interface Clima {
+  tempo: string;
+  temperaturaManha: string;
+  temperaturaTarde: string;
+  umidadeManha: string;
+  umidadeTarde: string;
+  vento: string;
+  uv: string;
+  observacoes: string;
+}
+
+interface ChecklistItem {
+  item: string;
+  status: boolean;
+}
+
+interface Produtividade {
+  atividadesPrevistas: string;
+  atividadesExecutadas: string;
+  percentualConcluido: string;
+  motivoAtraso: string;
+}
+
+interface MaterialUtilizado {
+  nome: string;
+  quantidade: string;
+  unidade: string;
+  observacoes: string;
+}
+
+interface StatusServico {
+  nome: string;
+  percentualConcluido: string;
+  motivoAtraso: string;
+  observacoes: string;
+}
+
+interface FormData {
+  rdoNumber: string;
+  empresa: string;
+  cliente: string;
+  usuarioPreencheu: string;
+  dataRelatorio: string;
+  localObra: string;
+  gerenteResponsavel: string;
+  tipoObra: string;
+  etapaAtual: string;
+  descricaoAtividade: string;
+  localizacaoObra: string;
+  efetivo: Efetivo[];
+  equipamentos: Equipamento[];
+  ferramentas: Ferramenta[];
+  clima: Clima;
+  checklistSeguranca: ChecklistItem[];
+  fotos: any[]; // Defina o tipo apropriado se necessário
+  produtividade: Produtividade;
+  incidentes: string;
+  observacoesFiscalizacao: string;
+  observacoesContratada: string;
+  materialUtilizado: MaterialUtilizado[];
+  statusServicos: StatusServico[];
+  assinaturaResponsavel: string;
+  assinaturaGerente: string;
+}
+
+const initialFormData: FormData = {
   rdoNumber: "001",
   empresa: "",
   cliente: "",
@@ -99,8 +192,8 @@ const initialFormData = {
   assinaturaGerente: "",
 };
 
-const RelatorioDiarioObras = () => {
-  const [formData, setFormData] = useState(initialFormData);
+const RelatorioDiarioObras: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -109,14 +202,14 @@ const RelatorioDiarioObras = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if (name.includes("clima.")) {
-      const key = name.split(".")[1];
+    if (name.startsWith("clima.")) {
+      const key = name.split(".")[1] as keyof Clima;
       setFormData({
         ...formData,
         clima: { ...formData.clima, [key]: value },
       });
-    } else if (name.includes("produtividade.")) {
-      const key = name.split(".")[1];
+    } else if (name.startsWith("produtividade.")) {
+      const key = name.split(".")[1] as keyof Produtividade;
       setFormData({
         ...formData,
         produtividade: { ...formData.produtividade, [key]: value },
@@ -130,31 +223,61 @@ const RelatorioDiarioObras = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number,
     field: string,
-    section: string
+    section: keyof Pick<
+      FormData,
+      | "efetivo"
+      | "equipamentos"
+      | "ferramentas"
+      | "materialUtilizado"
+      | "statusServicos"
+    >
   ) => {
     const newArray = [...formData[section]];
-    newArray[index][field] =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    newArray[index] = {
+      ...newArray[index],
+      [field]: e.target.value,
+    };
     setFormData({ ...formData, [section]: newArray });
   };
 
   const handleCheckboxChange = (
     index: number,
-    section: string,
+    section: "checklistSeguranca",
     value: boolean
   ) => {
     const newArray = [...formData[section]];
-    newArray[index].status = value;
+    newArray[index] = {
+      ...newArray[index],
+      status: value,
+    };
     setFormData({ ...formData, [section]: newArray });
   };
 
-  const addArrayItem = (section: string) => {
-    const newItem = { ...formData[section][0] };
-    Object.keys(newItem).forEach((key) => (newItem[key] = ""));
+  const addArrayItem = (
+    section: keyof Pick<
+      FormData,
+      | "efetivo"
+      | "equipamentos"
+      | "ferramentas"
+      | "materialUtilizado"
+      | "statusServicos"
+    >
+  ) => {
+    const newItem = { ...initialFormData[section][0] };
     setFormData({ ...formData, [section]: [...formData[section], newItem] });
   };
 
-  const removeArrayItem = (section: string, index: number) => {
+  const removeArrayItem = (
+    section: keyof Pick<
+      FormData,
+      | "efetivo"
+      | "equipamentos"
+      | "ferramentas"
+      | "materialUtilizado"
+      | "statusServicos"
+    >,
+    index: number
+  ) => {
     const newArray = [...formData[section]];
     newArray.splice(index, 1);
     setFormData({ ...formData, [section]: newArray });
